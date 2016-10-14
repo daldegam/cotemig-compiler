@@ -5,6 +5,7 @@
  */
 package compiler.lexical;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,6 +18,16 @@ public class Lexical {
      * Lista de erros
      */
     private List<String> errors;
+    
+    public List<String> getErrors() {
+        return this.errors;
+    }
+    
+    private List<String> output;
+    
+    public List<String> getOutput() {
+        return this.output;
+    }
 
     /**
      * Código fonte
@@ -42,6 +53,20 @@ public class Lexical {
         this.sourceCode = sourceCode;
         this.sourceCode += '\0';
         this.sourceOffsetPointer = 0;
+        this.errors = new ArrayList<String>();
+        this.output = new ArrayList<String>();
+    }
+
+    private void addErrorUnknownSymbol(char c) {
+        this.errors.add("Unknown symbol: " + c + "\n");
+    }
+
+    private void addErrorUnexpectedSymbol(char c) {
+        this.errors.add("Unexpected symbol: " + c + "\n");
+    }
+    
+    private void addOutput(String message) {
+        this.output.add(message);
     }
 
     /**
@@ -50,7 +75,8 @@ public class Lexical {
     public void parser() {
         Lexeme lexeme = this.getToken();
         while (lexeme != null) {
-            System.out.println(lexeme.getLexeme() + " - " + lexeme.getType());
+            
+            this.addOutput(String.format("<%s,\"%s\">\n", lexeme.getType(), lexeme.getLexeme()));
 
             lexeme = this.getToken(); // get next token
         }
@@ -127,7 +153,7 @@ public class Lexical {
                         this.finiteState = LexemeType.OP_REL_GT;
                     } else {
                         lexeme.removeLastChar();
-                        System.err.format("Erro: %c\n", currentChar);
+                        this.addErrorUnexpectedSymbol(currentChar);
                     }
                     break;
                 case LexemeType.NUM_DEC:
@@ -193,7 +219,7 @@ public class Lexical {
                         return lexeme.setType(LexemeType.OP_LOGICAL_OR);
                     } else {
                         lexeme.removeLastChar();
-                        System.err.format("Erro: %c\n", currentChar);
+                        this.addErrorUnexpectedSymbol(currentChar);
                     }
                     break;
                 case LexemeType.OP_LOGICAL_AND:
@@ -201,7 +227,7 @@ public class Lexical {
                         return lexeme.setType(LexemeType.OP_LOGICAL_AND);
                     } else {
                         lexeme.removeLastChar();
-                        System.err.format("Erro: %c\n", currentChar);
+                        this.addErrorUnexpectedSymbol(currentChar);
                     }
                     break;
                 case LexemeType.OP_REL_LT:
@@ -228,8 +254,7 @@ public class Lexical {
                         return lexeme.removeLastChar().setType(LexemeType.OP_REL_GT);
                     }
                 default:
-                    System.err.format("Erro: %c\n", currentChar);
-                //raiseerror
+                    this.addErrorUnknownSymbol(currentChar);
             }
         }
         return null;

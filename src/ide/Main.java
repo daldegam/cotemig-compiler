@@ -11,6 +11,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import compiler.Compiler;
+import java.util.List;
 
 /**
  *
@@ -208,6 +209,16 @@ public class Main extends javax.swing.JFrame {
     private void jMenuCompileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuCompileActionPerformed
         Compiler compiler = new Compiler(jEditorPaneCode);
         compiler.run();
+        
+        List<String> lexicalErrors = compiler.getLexicalErrors();
+        for(String error : lexicalErrors) {
+            jTextAreaErrors.append("Lexical Error: " + error);
+        }
+        
+        List<String> lexicalOutputs = compiler.getLexicalOutput();
+        for(String message : lexicalOutputs) {
+            jTextAreaLexicalOutput.append(message);
+        }
     }//GEN-LAST:event_jMenuCompileActionPerformed
 
     /**

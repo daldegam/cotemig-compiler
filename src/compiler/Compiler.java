@@ -8,6 +8,7 @@ package compiler;
 import javax.swing.JEditorPane;
 
 import compiler.lexical.Lexical;
+import java.util.List;
 
 /**
  *
@@ -18,6 +19,14 @@ public class Compiler {
     private JEditorPane sourceEditor;
 
     private Lexical lexical;
+    
+    public List<String> getLexicalErrors() {
+        return this.lexical.getErrors();
+    }
+    
+    public List<String> getLexicalOutput() {
+        return this.lexical.getOutput();
+    }
 
     public Compiler(JEditorPane sourceEditor) {
         this.sourceEditor = sourceEditor;
