@@ -84,7 +84,7 @@ public class Lexical {
         Lexeme lexeme = this.getToken();
         while (lexeme != null) {
 
-            this.addOutput(String.format("<%s,\"%s\">\n", lexeme.getType(), lexeme.getLexeme()));
+            this.addOutput(String.format("<%s,\"%s\">\n", lexeme.getTypeString(), lexeme.getLexeme()));
 
             lexeme = this.getToken(); // get next token
         }
