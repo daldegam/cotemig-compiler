@@ -28,7 +28,9 @@ public class Main extends javax.swing.JFrame {
         jEditorPaneCode.setText(
             "123123 0777 123.123123 0x123123 , leANdro Leandro teste123; " + 
             "{ asd } [ teste ] ( teste ) + - * % / if ( 11 && 22 || 33 == !44) { print }\n\n" +
-            "1 < 2 && 2 <= 3 && 3 <> 4 || 2 == 5 || t = 6 || t > r || t >= 4 ^$  "
+            "1 < 2 && 2 <= 3 && 3 <> 4 || 2 == 5 || t = 6 || t > r || t >= 4 ^$ /* isso tem que ser ignorado */ \n " + 
+            "//isso tambem deve ser ignorado \n" + 
+            " teste = 123;"
         );
     }
 

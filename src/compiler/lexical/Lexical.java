@@ -18,13 +18,13 @@ public class Lexical {
      * Lista de erros
      */
     private List<String> errors;
-    
+
     public List<String> getErrors() {
         return this.errors;
     }
-    
+
     private List<String> output;
-    
+
     public List<String> getOutput() {
         return this.output;
     }
@@ -64,7 +64,7 @@ public class Lexical {
     private void addErrorUnexpectedSymbol(char c) {
         this.errors.add("Unexpected symbol: " + c + "\n");
     }
-    
+
     private void addOutput(String message) {
         this.output.add(message);
     }
@@ -75,7 +75,7 @@ public class Lexical {
     public void parser() {
         Lexeme lexeme = this.getToken();
         while (lexeme != null) {
-            
+
             this.addOutput(String.format("<%s,\"%s\">\n", lexeme.getType(), lexeme.getLexeme()));
 
             lexeme = this.getToken(); // get next token
@@ -138,7 +138,7 @@ public class Lexical {
                     } else if (currentChar == '%') {
                         return lexeme.setType(LexemeType.OP_ARITMETIC_MOD);
                     } else if (currentChar == '/') {
-                        return lexeme.setType(LexemeType.OP_ARITMETIC_DIV);
+                        this.finiteState = LexemeType.OP_ARITMETIC_DIV;
                     } else if (currentChar == '|') {
                         this.finiteState = LexemeType.OP_LOGICAL_OR;
                     } else if (currentChar == '&') {
@@ -253,6 +253,39 @@ public class Lexical {
                         this.sourceOffsetPointer--;
                         return lexeme.removeLastChar().setType(LexemeType.OP_REL_GT);
                     }
+                case LexemeType.OP_ARITMETIC_DIV: // possible comment
+                    lexeme.removeLastChar();
+                    if (currentChar == '*') {
+                        lexeme.removeLastChar(); 
+                        this.finiteState = LexemeType.OP_ARITMETIC_DIV + 1; // comment block
+                    } else if (currentChar == '/') {
+                        lexeme.removeLastChar(); 
+                        this.finiteState = LexemeType.OP_ARITMETIC_DIV + 3; // comment line
+                    } else {
+                        this.sourceOffsetPointer--;
+                        return lexeme.setType(LexemeType.OP_ARITMETIC_DIV); // operator div
+                    }
+                    break;
+                case LexemeType.OP_ARITMETIC_DIV + 1: // comment block
+                    lexeme.removeLastChar();
+                    if (currentChar == '*') {
+                        this.finiteState = LexemeType.OP_ARITMETIC_DIV + 2;
+                    }
+                    break;
+                case LexemeType.OP_ARITMETIC_DIV + 2: // comment block
+                    lexeme.removeLastChar();
+                    if (currentChar == '/') {
+                        this.finiteState = 0; // begin to initial state
+                    } else {
+                        this.finiteState = LexemeType.OP_ARITMETIC_DIV + 1;
+                    }
+                    break;
+                case LexemeType.OP_ARITMETIC_DIV + 3: // comment
+                    lexeme.removeLastChar();
+                    if (currentChar == '\n') {
+                        this.finiteState = 0; // begin to initial state
+                    }
+                    break;
                 default:
                     this.addErrorUnknownSymbol(currentChar);
             }
