@@ -5,6 +5,7 @@
  */
 package compiler.lexical;
 
+import compiler.SymbolTable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,11 @@ public class Lexical {
     }
 
     /**
+     * Tabela de simbolos
+     */
+    private SymbolTable symbolTable;
+
+    /**
      * Código fonte
      */
     private String sourceCode;
@@ -49,18 +55,19 @@ public class Lexical {
      *
      * @param sourceCode Codigo fonte
      */
-    public Lexical(String sourceCode) {
+    public Lexical(SymbolTable symbolTable, String sourceCode) {
+        this.symbolTable = symbolTable;
         this.sourceCode = sourceCode;
         this.sourceCode += '\0';
         this.sourceOffsetPointer = 0;
         this.errors = new ArrayList<String>();
         this.output = new ArrayList<String>();
     }
-    
+
     private void addErrorCommentWithoutEnd() {
         this.errors.add("Comment without end (fatal error)\n");
     }
-    
+
     private void addErrorStringWithoutEnd() {
         this.errors.add("String without end (fatal error)\n");
     }
@@ -83,8 +90,9 @@ public class Lexical {
     public void parser() {
         Lexeme lexeme = this.getToken();
         while (lexeme != null) {
-
             this.addOutput(String.format("<%s,\"%s\">\n", lexeme.getTypeString(), lexeme.getLexeme()));
+
+            this.symbolTable.checkAndInstall(lexeme);
 
             lexeme = this.getToken(); // get next token
         }
@@ -266,10 +274,10 @@ public class Lexical {
                 case LexemeType.OP_ARITMETIC_DIV: // possible comment
                     lexeme.removeLastChar();
                     if (currentChar == '*') {
-                        lexeme.removeLastChar(); 
+                        lexeme.removeLastChar();
                         this.finiteState = LexemeType.OP_ARITMETIC_DIV + 1; // comment block
                     } else if (currentChar == '/') {
-                        lexeme.removeLastChar(); 
+                        lexeme.removeLastChar();
                         this.finiteState = LexemeType.OP_ARITMETIC_DIV + 3; // comment line
                     } else {
                         this.sourceOffsetPointer--;
@@ -280,8 +288,7 @@ public class Lexical {
                     lexeme.removeLastChar();
                     if (currentChar == '*') {
                         this.finiteState = LexemeType.OP_ARITMETIC_DIV + 2;
-                    }
-                    else if(currentChar == '\0') {
+                    } else if (currentChar == '\0') {
                         this.addErrorCommentWithoutEnd();
                     }
                     break;
@@ -300,13 +307,11 @@ public class Lexical {
                     }
                     break;
                 case LexemeType.STRING:
-                    if(currentChar == '\"') {
+                    if (currentChar == '\"') {
                         return lexeme.setType(LexemeType.STRING);
-                    }
-                    else if (currentChar == '\\') {
+                    } else if (currentChar == '\\') {
                         this.finiteState = LexemeType.STRING + 1;
-                    }
-                    else if (currentChar == '\0') {
+                    } else if (currentChar == '\0') {
                         this.addErrorStringWithoutEnd();
                     }
                     break;

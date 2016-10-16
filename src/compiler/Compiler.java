@@ -18,22 +18,27 @@ public class Compiler {
 
     private JEditorPane sourceEditor;
 
+    private SymbolTable symbolTable;
+
     private Lexical lexical;
-    
+
     public List<String> getLexicalErrors() {
         return this.lexical.getErrors();
     }
-    
+
     public List<String> getLexicalOutput() {
         return this.lexical.getOutput();
     }
 
     public Compiler(JEditorPane sourceEditor) {
         this.sourceEditor = sourceEditor;
+        this.symbolTable = new SymbolTable();
     }
 
     public void run() {
-        this.lexical = new Lexical(this.sourceEditor.getText());
+        this.lexical = new Lexical(this.symbolTable, this.sourceEditor.getText());
         this.lexical.parser();
+
+        this.symbolTable.printTable();
     }
 }
