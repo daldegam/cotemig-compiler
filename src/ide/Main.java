@@ -52,6 +52,9 @@ public class Main extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTextAreaLexicalOutput = new javax.swing.JTextArea();
+        jPanel3 = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jTextAreaSymbolTable = new javax.swing.JTextArea();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuNew = new javax.swing.JMenuItem();
@@ -102,6 +105,23 @@ public class Main extends javax.swing.JFrame {
         );
 
         jTabbedPane1.addTab("Analise Léxica", jPanel2);
+
+        jTextAreaSymbolTable.setColumns(20);
+        jTextAreaSymbolTable.setRows(5);
+        jScrollPane4.setViewportView(jTextAreaSymbolTable);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 660, Short.MAX_VALUE)
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Tabela de simbolos", jPanel3);
 
         jMenu1.setText("Arquivo");
 
@@ -209,6 +229,9 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuAboutActionPerformed
 
     private void jMenuCompileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuCompileActionPerformed
+        jTextAreaErrors.setText("");
+        jTextAreaLexicalOutput.setText("");
+        jTextAreaSymbolTable.setText("");
         Compiler compiler = new Compiler(jEditorPaneCode);
         compiler.run();
         
@@ -220,6 +243,11 @@ public class Main extends javax.swing.JFrame {
         List<String> lexicalOutputs = compiler.getLexicalOutput();
         for(String message : lexicalOutputs) {
             jTextAreaLexicalOutput.append(message);
+        }
+        
+        List<String> symbolTableOutput = compiler.getSymbolTable();
+        for(String message : symbolTableOutput) {
+            jTextAreaSymbolTable.append(message);
         }
     }//GEN-LAST:event_jMenuCompileActionPerformed
 
@@ -248,11 +276,14 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuOpen;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextArea jTextAreaErrors;
     private javax.swing.JTextArea jTextAreaLexicalOutput;
+    private javax.swing.JTextArea jTextAreaSymbolTable;
     // End of variables declaration//GEN-END:variables
 }

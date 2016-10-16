@@ -7,7 +7,9 @@ package compiler;
 
 import compiler.lexical.Lexeme;
 import compiler.lexical.LexemeType;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  *
@@ -41,12 +43,11 @@ public class SymbolTable {
         }
     }
 
-    public void printTable() {
-        System.out.println("////////////////////////////////////////////");
-        System.out.println("/////// START PRINT TABLE OF SYMBOLS ///////");
-        System.out.println("////////////////////////////////////////////");
+    public List<String> getTableString() {
+        List<String> output = new ArrayList<String>();
         for (Lexeme symbol : this.symbolTable) {
-            System.out.format("<%s,\"%s\">\n", symbol.getTypeString(), symbol.getLexeme());
+            output.add(String.format("<%s,\"%s\">\n", symbol.getTypeString(), symbol.getLexeme()));
         }
+        return output;
     }
 }

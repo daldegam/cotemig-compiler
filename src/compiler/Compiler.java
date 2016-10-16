@@ -29,6 +29,10 @@ public class Compiler {
     public List<String> getLexicalOutput() {
         return this.lexical.getOutput();
     }
+    
+    public List<String> getSymbolTable() {
+        return this.symbolTable.getTableString();
+    }
 
     public Compiler(JEditorPane sourceEditor) {
         this.sourceEditor = sourceEditor;
@@ -38,7 +42,5 @@ public class Compiler {
     public void run() {
         this.lexical = new Lexical(this.symbolTable, this.sourceEditor.getText());
         this.lexical.parser();
-
-        this.symbolTable.printTable();
     }
 }
