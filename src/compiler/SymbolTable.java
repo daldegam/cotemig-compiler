@@ -25,7 +25,17 @@ public class SymbolTable {
     }
 
     private void installDefaultTokens() {
-
+        this.add(new Lexeme("true", LexemeType.TRUE));
+        this.add(new Lexeme("false", LexemeType.FALSE));
+        this.add(new Lexeme("if", LexemeType.IF));
+        this.add(new Lexeme("else", LexemeType.ELSE));
+        this.add(new Lexeme("while", LexemeType.WHILE));
+        this.add(new Lexeme("break", LexemeType.BREAK));
+        this.add(new Lexeme("for", LexemeType.FOR));
+        this.add(new Lexeme("char", LexemeType.TYPE_CHAR));
+        this.add(new Lexeme("int", LexemeType.TYPE_INT));
+        this.add(new Lexeme("double", LexemeType.TYPE_DOUBLE));
+        this.add(new Lexeme("bool", LexemeType.TYPE_BOOL));
     }
 
     public void add(Lexeme lexeme) {

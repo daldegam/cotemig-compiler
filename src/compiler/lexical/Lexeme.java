@@ -21,6 +21,11 @@ public class Lexeme {
     public Lexeme() {
         this.lexeme = "";
     }
+    
+    public Lexeme(String lexeme, int type) {
+        this.lexeme = lexeme;
+        this.type = type;
+    }
 
     public Lexeme setType(int type) {
         this.type = type;
