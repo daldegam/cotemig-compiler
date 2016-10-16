@@ -30,7 +30,7 @@ public class Main extends javax.swing.JFrame {
             "{ asd } [ teste ] ( teste ) + - * % / if ( 11 && 22 || 33 == !44) { print }\n\n" +
             "1 < 2 && 2 <= 3 && 3 <> 4 || 2 == 5 || t = 6 || t > r || t >= 4 ^$ /* isso tem que ser ignorado */ \n " + 
             "//isso tambem deve ser ignorado \n" + 
-            " teste = 123;"
+            " teste = 123; \"string\" \"teste de string ok\" \"teste de string \\\" com aspas\" \"ts \\ ok\"  "
         );
     }
 

@@ -57,8 +57,12 @@ public class Lexical {
         this.output = new ArrayList<String>();
     }
     
-    private void addCommentWithoutEnd() {
+    private void addErrorCommentWithoutEnd() {
         this.errors.add("Comment without end (fatal error)\n");
+    }
+    
+    private void addErrorStringWithoutEnd() {
+        this.errors.add("String without end (fatal error)\n");
     }
 
     private void addErrorUnknownSymbol(char c) {
@@ -155,9 +159,11 @@ public class Lexical {
                         this.finiteState = LexemeType.OP_ATTRIBUTION;
                     } else if (currentChar == '>') {
                         this.finiteState = LexemeType.OP_REL_GT;
+                    } else if (currentChar == '"') {
+                        this.finiteState = LexemeType.STRING;
                     } else {
                         lexeme.removeLastChar();
-                        this.addErrorUnexpectedSymbol(currentChar);
+                        this.addErrorUnknownSymbol(currentChar);
                     }
                     break;
                 case LexemeType.NUM_DEC:
@@ -276,7 +282,7 @@ public class Lexical {
                         this.finiteState = LexemeType.OP_ARITMETIC_DIV + 2;
                     }
                     else if(currentChar == '\0') {
-                        this.addCommentWithoutEnd();
+                        this.addErrorCommentWithoutEnd();
                     }
                     break;
                 case LexemeType.OP_ARITMETIC_DIV + 2: // comment block
@@ -292,6 +298,20 @@ public class Lexical {
                     if (currentChar == '\n') {
                         this.finiteState = 0; // begin to initial state
                     }
+                    break;
+                case LexemeType.STRING:
+                    if(currentChar == '\"') {
+                        return lexeme.setType(LexemeType.STRING);
+                    }
+                    else if (currentChar == '\\') {
+                        this.finiteState = LexemeType.STRING + 1;
+                    }
+                    else if (currentChar == '\0') {
+                        this.addErrorStringWithoutEnd();
+                    }
+                    break;
+                case LexemeType.STRING + 1:
+                    this.finiteState = LexemeType.STRING; // just consume char and back to string state
                     break;
                 default:
                     this.addErrorUnknownSymbol(currentChar);
