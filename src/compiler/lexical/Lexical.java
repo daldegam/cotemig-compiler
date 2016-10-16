@@ -56,6 +56,10 @@ public class Lexical {
         this.errors = new ArrayList<String>();
         this.output = new ArrayList<String>();
     }
+    
+    private void addCommentWithoutEnd() {
+        this.errors.add("Comment without end (fatal error)\n");
+    }
 
     private void addErrorUnknownSymbol(char c) {
         this.errors.add("Unknown symbol: " + c + "\n");
@@ -270,6 +274,9 @@ public class Lexical {
                     lexeme.removeLastChar();
                     if (currentChar == '*') {
                         this.finiteState = LexemeType.OP_ARITMETIC_DIV + 2;
+                    }
+                    else if(currentChar == '\0') {
+                        this.addCommentWithoutEnd();
                     }
                     break;
                 case LexemeType.OP_ARITMETIC_DIV + 2: // comment block
