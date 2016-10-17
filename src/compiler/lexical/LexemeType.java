@@ -5,6 +5,12 @@
  */
 package compiler.lexical;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Daldegam
@@ -51,4 +57,42 @@ public class LexemeType {
     public static final int TYPE_DOUBLE             = 0x00002800;
     public static final int TYPE_BOOL               = 0x00002900;
     public static final int IDENTIFIER              = 0x00002A00;
+    
+    /**
+     * Mapa dos nomes dos tipos (runtime)
+     */
+    private static Map<Integer, String> FriendlyTypes;
+    
+    /**
+     * Obtem o nome do tipo
+     * @param type Número do tipo
+     * @return Nome do tipo (Nome da variavel)
+     */
+    public static String getTypeName(int type) {
+        return FriendlyTypes.get(type);
+    }
+    
+    /**
+     * Executa em tempo de execução utilizando reflection;
+     * Obtem as variáveis da classe LexemeType, e armazena em um HashMap 
+     * para que outras partes do programa obtenha o nome do tipo.
+     */
+    static {
+        FriendlyTypes = new HashMap<Integer, String>();
+        
+        Field fieldCollection[] = LexemeType.class.getDeclaredFields();
+        for (int i = 0; i < fieldCollection.length; i++) {
+            Integer test = new Integer(0);
+            if (fieldCollection[i].getName().equals("FriendlyTypes") == false) {
+                try {
+                    FriendlyTypes.put(fieldCollection[i].getInt(test), fieldCollection[i].getName());
+                } catch (IllegalArgumentException ex) {
+                    Logger.getLogger(Lexeme.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(Lexeme.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        
+    }
 }
