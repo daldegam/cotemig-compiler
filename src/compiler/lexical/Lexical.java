@@ -111,6 +111,24 @@ public class Lexical {
             lexeme = this.getToken(); // get next token
         }
     }
+    
+    /**
+     * Incrementa uma posição do carro no codigo fonte
+     * @return Posição global no código fonte
+     */
+    private int nextSourceOffsetPointer() {
+        this.sourceOffsetLinePositionPointer++;
+        return this.sourceOffsetPointer++;
+    }
+    
+    /**
+     * Decrementa uma posição do carro no código fonte
+     * @return Posição global no código fonte
+     */
+    private int backSourceOffsetPointer() {
+        this.sourceOffsetLinePositionPointer--;
+        return this.sourceOffsetPointer--;
+    }
 
     /**
      * Obtem o proximo char do codigo fonte
@@ -118,8 +136,7 @@ public class Lexical {
      * @return caractere a ser tratado
      */
     private char getNextChar() {
-        this.sourceOffsetLinePositionPointer++;
-        return this.sourceCode.charAt(this.sourceOffsetPointer++);
+        return this.sourceCode.charAt(this.nextSourceOffsetPointer());
     }
 
     private Lexeme getToken() {
@@ -202,8 +219,7 @@ public class Lexical {
                     } else if (currentChar == 'X' || currentChar == 'x') {
                         this.finiteState = LexemeType.NUM_HEX;
                     } else {
-                        this.sourceOffsetPointer--;
-                        this.sourceOffsetLinePositionPointer--;
+                        this.backSourceOffsetPointer();
                         return lexeme.removeLastChar().setType(LexemeType.NUM_DEC);
                     }
                     break;
@@ -213,8 +229,7 @@ public class Lexical {
                     } else if (currentChar == '.') {
                         this.finiteState = LexemeType.NUM_REAL;
                     } else {
-                        this.sourceOffsetPointer--;
-                        this.sourceOffsetLinePositionPointer--;
+                        this.backSourceOffsetPointer();
                         return lexeme.removeLastChar().setType(LexemeType.NUM_DEC);
                     }
                     break;
@@ -222,8 +237,7 @@ public class Lexical {
                     if (currentChar >= '0' && currentChar <= '7') {
                         this.finiteState = LexemeType.NUM_OCT; // do not change state
                     } else {
-                        this.sourceOffsetPointer--;
-                        this.sourceOffsetLinePositionPointer--;
+                        this.backSourceOffsetPointer();
                         return lexeme.removeLastChar().setType(LexemeType.NUM_OCT);
                     }
                     break;
@@ -231,8 +245,7 @@ public class Lexical {
                     if (currentChar >= '0' && currentChar <= '9') {
                         this.finiteState = LexemeType.NUM_REAL; // do not change state
                     } else {
-                        this.sourceOffsetPointer--;
-                        this.sourceOffsetLinePositionPointer--;
+                        this.backSourceOffsetPointer();
                         return lexeme.removeLastChar().setType(LexemeType.NUM_REAL);
                     }
                     break;
@@ -242,8 +255,7 @@ public class Lexical {
                     } else if ((currentChar >= 'A' && currentChar <= 'F') || (currentChar >= 'a' && currentChar <= 'f')) {
                         this.finiteState = LexemeType.NUM_HEX; // do not change state
                     } else {
-                        this.sourceOffsetPointer--;
-                        this.sourceOffsetLinePositionPointer--;
+                        this.backSourceOffsetPointer();
                         return lexeme.removeLastChar().setType(LexemeType.NUM_HEX);
                     }
                     break;
@@ -253,8 +265,7 @@ public class Lexical {
                     } else if (currentChar >= '0' && currentChar <= '9') {
                         this.finiteState = LexemeType.IDENTIFIER;
                     } else {
-                        this.sourceOffsetPointer--;
-                        this.sourceOffsetLinePositionPointer--;
+                        this.backSourceOffsetPointer();
                         return lexeme.removeLastChar().setType(LexemeType.IDENTIFIER);
                     }
                     break;
@@ -280,24 +291,21 @@ public class Lexical {
                     } else if (currentChar == '>') {
                         return lexeme.setType(LexemeType.OP_REL_NE);
                     } else {
-                        this.sourceOffsetPointer--;
-                        this.sourceOffsetLinePositionPointer--;
+                        this.backSourceOffsetPointer();
                         return lexeme.removeLastChar().setType(LexemeType.OP_REL_LT);
                     }
                 case LexemeType.OP_ATTRIBUTION:
                     if (currentChar == '=') {
                         return lexeme.setType(LexemeType.OP_REL_EQ);
                     } else {
-                        this.sourceOffsetPointer--;
-                        this.sourceOffsetLinePositionPointer--;
+                        this.backSourceOffsetPointer();
                         return lexeme.removeLastChar().setType(LexemeType.OP_ATTRIBUTION);
                     }
                 case LexemeType.OP_REL_GT:
                     if (currentChar == '=') {
                         return lexeme.setType(LexemeType.OP_REL_GE);
                     } else {
-                        this.sourceOffsetPointer--;
-                        this.sourceOffsetLinePositionPointer--;
+                        this.backSourceOffsetPointer();
                         return lexeme.removeLastChar().setType(LexemeType.OP_REL_GT);
                     }
                 case LexemeType.OP_ARITMETIC_DIV: // possible comment
@@ -309,8 +317,7 @@ public class Lexical {
                         lexeme.removeLastChar();
                         this.finiteState = LexemeType.OP_ARITMETIC_DIV + 3; // comment line
                     } else {
-                        this.sourceOffsetPointer--;
-                        this.sourceOffsetLinePositionPointer--;
+                        this.backSourceOffsetPointer();
                         return lexeme.setType(LexemeType.OP_ARITMETIC_DIV); // operator div
                     }
                     break;
