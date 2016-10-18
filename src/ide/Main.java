@@ -225,7 +225,7 @@ public class Main extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuNewActionPerformed
 
     private void jMenuAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuAboutActionPerformed
-        JOptionPane.showMessageDialog(this, "Trabalho de compiladores\n\nDesenvolvido por Leandro Daldegam - 71401067.\n\nFaculdade COTEMIG - 2016.2");
+        JOptionPane.showMessageDialog(this, "Trabalho de compiladores\n\nDesenvolvido por:\n\tLeandro Henrique Daldegam Fontes\n\tPaulo Henrique de Almeida\n\nFaculdade COTEMIG - 2016/2");
     }//GEN-LAST:event_jMenuAboutActionPerformed
 
     private void jMenuCompileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuCompileActionPerformed
