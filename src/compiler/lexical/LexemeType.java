@@ -57,6 +57,8 @@ public class LexemeType {
     public static final int TYPE_DOUBLE             = 0x00002800;
     public static final int TYPE_BOOL               = 0x00002900;
     public static final int IDENTIFIER              = 0x00002A00;
+    public static final int PRINT                   = 0x00002B00;
+    public static final int READ                    = 0x00002C00;
     
     /**
      * Mapa dos nomes dos tipos (runtime)

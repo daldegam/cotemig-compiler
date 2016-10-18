@@ -36,6 +36,8 @@ public class SymbolTable {
         this.add(new Lexeme("int", LexemeType.TYPE_INT));
         this.add(new Lexeme("double", LexemeType.TYPE_DOUBLE));
         this.add(new Lexeme("bool", LexemeType.TYPE_BOOL));
+        this.add(new Lexeme("print", LexemeType.PRINT));
+        this.add(new Lexeme("read", LexemeType.READ));
     }
 
     public void add(Lexeme lexeme) {
