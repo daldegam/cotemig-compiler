@@ -54,7 +54,7 @@ public class LexemeType {
     public static final int FOR                     = 0x00002500;
     public static final int TYPE_CHAR               = 0x00002600;
     public static final int TYPE_INT                = 0x00002700;
-    public static final int TYPE_DOUBLE             = 0x00002800;
+    public static final int TYPE_REAL               = 0x00002800;
     public static final int TYPE_BOOL               = 0x00002900;
     public static final int IDENTIFIER              = 0x00002A00;
     public static final int PRINT                   = 0x00002B00;
