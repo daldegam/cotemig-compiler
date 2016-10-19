@@ -84,6 +84,10 @@ public class Lexical {
         this.errors.add("String without end (fatal error)\n");
     }
 
+    private void addErrorCharWithoutEnd() {
+        this.errors.add("Char without end (fatal error)\n");
+    }
+
     private void addErrorUnknownSymbol(char c) {
         this.errors.add("Unknown symbol: " + c + ", line: " 
                 + (this.sourceOffsetLinePointer + 1) + ", position: " + (this.sourceOffsetLinePositionPointer - 1) + "\n");
@@ -206,6 +210,8 @@ public class Lexical {
                         this.finiteState = LexemeType.OP_REL_GT;
                     } else if (currentChar == '"') {
                         this.finiteState = LexemeType.STRING;
+                    } else if (currentChar == '\'') {
+                        this.finiteState = LexemeType.CHAR;
                     } else {
                         lexeme.removeLastChar();
                         this.addErrorUnknownSymbol(currentChar);
@@ -354,6 +360,18 @@ public class Lexical {
                     break;
                 case LexemeType.STRING + 1:
                     this.finiteState = LexemeType.STRING; // just consume char and back to string state
+                    break;
+                case LexemeType.CHAR:
+                    if (currentChar == '\'') {
+                        return lexeme.setType(LexemeType.CHAR);
+                    } else if (currentChar == '\\') {
+                        this.finiteState = LexemeType.CHAR + 1;
+                    } else if (currentChar == '\0') {
+                        this.addErrorCharWithoutEnd();
+                    }
+                    break;
+                case LexemeType.CHAR + 1:
+                    this.finiteState = LexemeType.CHAR; // just consume char and back to char state
                     break;
                 default:
                     this.addErrorUnknownSymbol(currentChar);

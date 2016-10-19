@@ -59,6 +59,7 @@ public class LexemeType {
     public static final int IDENTIFIER              = 0x00002A00;
     public static final int PRINT                   = 0x00002B00;
     public static final int READ                    = 0x00002C00;
+    public static final int CHAR                    = 0x00002D00;
     
     /**
      * Mapa dos nomes dos tipos (runtime)
