@@ -76,28 +76,52 @@ public class Lexical {
         this.output = new ArrayList<String>();
     }
 
-    private void addErrorCommentWithoutEnd() {
+    /**
+     * Levanta um erro de declaração de comentário sem termino
+     * @param c Simbolo
+     */
+    private void raiseErrorCommentWithoutEnd() {
         this.errors.add("Comment without end (fatal error)\n");
     }
 
-    private void addErrorStringWithoutEnd() {
+    /**
+     * Levanta um erro de declaração de string sem termino
+     * @param c Simbolo
+     */
+    private void raiseErrorStringWithoutEnd() {
         this.errors.add("String without end (fatal error)\n");
     }
 
-    private void addErrorCharWithoutEnd() {
+    /**
+     * Levanta um erro de declaração de char sem termino
+     * @param c Simbolo
+     */
+    private void raiseErrorCharWithoutEnd() {
         this.errors.add("Char without end (fatal error)\n");
     }
-
-    private void addErrorUnknownSymbol(char c) {
+    
+    /**
+     * Levanta um erro de simbolo não reconhecido
+     * @param c Simbolo
+     */
+    private void raiseErrorUnknownSymbol(char c) {
         this.errors.add("Unknown symbol: " + c + ", line: " 
                 + (this.sourceOffsetLinePointer + 1) + ", position: " + (this.sourceOffsetLinePositionPointer - 1) + "\n");
     }
 
-    private void addErrorUnexpectedSymbol(char c) {
+    /**
+     * Levanta um erro de simbolo não esperado
+     * @param c Simbolo
+     */
+    private void raiseErrorUnexpectedSymbol(char c) {
         this.errors.add("Unexpected symbol: " + c + ", line: " 
                 + (this.sourceOffsetLinePointer + 1) + ", position: " + (this.sourceOffsetLinePositionPointer - 1) + "\n");
     }
 
+    /**
+     * Adiciona uma mensagem no output do analisador
+     * @param message Mensagem
+     */
     private void addOutput(String message) {
         this.output.add(message);
     }
@@ -136,13 +160,16 @@ public class Lexical {
 
     /**
      * Obtem o proximo char do codigo fonte
-     *
      * @return caractere a ser tratado
      */
     private char getNextChar() {
         return this.sourceCode.charAt(this.nextSourceOffsetPointer());
     }
 
+    /**
+     * Retorna um proximo token do codigo fonte
+     * @return 
+     */
     private Lexeme getToken() {
         this.finiteState = 0;
         Lexeme lexeme = new Lexeme();
@@ -214,7 +241,7 @@ public class Lexical {
                         this.finiteState = LexemeType.CHAR;
                     } else {
                         lexeme.removeLastChar();
-                        this.addErrorUnknownSymbol(currentChar);
+                        this.raiseErrorUnknownSymbol(currentChar);
                     }
                     break;
                 case LexemeType.NUM_DEC:
@@ -280,7 +307,7 @@ public class Lexical {
                         return lexeme.setType(LexemeType.OP_LOGICAL_OR);
                     } else {
                         lexeme.removeLastChar();
-                        this.addErrorUnexpectedSymbol(currentChar);
+                        this.raiseErrorUnexpectedSymbol(currentChar);
                     }
                     break;
                 case LexemeType.OP_LOGICAL_AND:
@@ -288,7 +315,7 @@ public class Lexical {
                         return lexeme.setType(LexemeType.OP_LOGICAL_AND);
                     } else {
                         lexeme.removeLastChar();
-                        this.addErrorUnexpectedSymbol(currentChar);
+                        this.raiseErrorUnexpectedSymbol(currentChar);
                     }
                     break;
                 case LexemeType.OP_REL_LT:
@@ -332,7 +359,7 @@ public class Lexical {
                     if (currentChar == '*') {
                         this.finiteState = LexemeType.OP_ARITMETIC_DIV + 2;
                     } else if (currentChar == '\0') {
-                        this.addErrorCommentWithoutEnd();
+                        this.raiseErrorCommentWithoutEnd();
                     }
                     break;
                 case LexemeType.OP_ARITMETIC_DIV + 2: // comment block
@@ -355,7 +382,7 @@ public class Lexical {
                     } else if (currentChar == '\\') {
                         this.finiteState = LexemeType.STRING + 1;
                     } else if (currentChar == '\0') {
-                        this.addErrorStringWithoutEnd();
+                        this.raiseErrorStringWithoutEnd();
                     }
                     break;
                 case LexemeType.STRING + 1:
@@ -367,14 +394,14 @@ public class Lexical {
                     } else if (currentChar == '\\') {
                         this.finiteState = LexemeType.CHAR + 1;
                     } else if (currentChar == '\0') {
-                        this.addErrorCharWithoutEnd();
+                        this.raiseErrorCharWithoutEnd();
                     }
                     break;
                 case LexemeType.CHAR + 1:
                     this.finiteState = LexemeType.CHAR; // just consume char and back to char state
                     break;
                 default:
-                    this.addErrorUnknownSymbol(currentChar);
+                    this.raiseErrorUnknownSymbol(currentChar);
             }
         }
         return null;
