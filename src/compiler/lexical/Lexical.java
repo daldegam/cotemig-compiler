@@ -299,7 +299,9 @@ public class Lexical {
                         this.finiteState = LexemeType.IDENTIFIER;
                     } else {
                         this.backSourceOffsetPointer();
-                        return lexeme.removeLastChar().setType(LexemeType.IDENTIFIER);
+                        lexeme.removeLastChar();
+                        int tempLexemeType = this.symbolTable.resolveLexemeType(lexeme);
+                        return lexeme.setType(tempLexemeType);
                     }
                     break;
                 case LexemeType.OP_LOGICAL_OR:

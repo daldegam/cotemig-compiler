@@ -55,6 +55,15 @@ public class SymbolTable {
         }
     }
 
+    public int resolveLexemeType(Lexeme lexeme) {
+        for (Lexeme symbol : this.symbolTable) {
+            if (symbol.getLexeme().equals(lexeme.getLexeme().toLowerCase())) {
+                return symbol.getType();
+            }
+        }
+        return LexemeType.IDENTIFIER;
+    }
+
     public List<String> getTableString() {
         List<String> output = new ArrayList<String>();
         for (Lexeme symbol : this.symbolTable) {
