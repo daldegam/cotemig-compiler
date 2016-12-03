@@ -308,16 +308,26 @@ public class Lexical {
                     if (currentChar == '|') {
                         return lexeme.setType(LexemeType.OP_LOGICAL_OR);
                     } else {
-                        lexeme.removeLastChar();
+                        lexeme.removeLastChar(); // first |
+                        lexeme.removeLastChar(); // actual symbol
+
                         this.raiseErrorUnexpectedSymbol(currentChar);
+                        
+                        this.backSourceOffsetPointer();
+                        this.finiteState = 0; // back to initial state
                     }
                     break;
                 case LexemeType.OP_LOGICAL_AND:
                     if (currentChar == '&') {
                         return lexeme.setType(LexemeType.OP_LOGICAL_AND);
                     } else {
-                        lexeme.removeLastChar();
+                        lexeme.removeLastChar(); // first &
+                        lexeme.removeLastChar(); // actual symbol
+
                         this.raiseErrorUnexpectedSymbol(currentChar);
+                        
+                        this.backSourceOffsetPointer();
+                        this.finiteState = 0; // back to initial state
                     }
                     break;
                 case LexemeType.OP_REL_LT:
