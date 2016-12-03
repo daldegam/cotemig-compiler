@@ -17,6 +17,8 @@ public class Lexeme {
 
     private int type;
     private String lexeme;
+    private int sourceLine;
+    private int sourceColumn;
 
     public Lexeme() {
         this.lexeme = "";
@@ -51,5 +53,21 @@ public class Lexeme {
 
     public String getTypeString() {
         return LexemeType.getTypeName(this.type);
+    }
+    
+    public int getSourceLine() {
+        return sourceLine;
+    }
+
+    public void setSourceLine(int sourceLine) {
+        this.sourceLine = sourceLine;
+    }
+
+    public int getSourceColumn() {
+        return sourceColumn;
+    }
+
+    public void setSourceColumn(int sourceColumn) {
+        this.sourceColumn = sourceColumn;
     }
 }
