@@ -158,7 +158,7 @@ public class Syntactic {
             if (this.lexeme.getType() == LexemeType.NUM_DEC) {
                 this.matchToken(LexemeType.NUM_DEC);
             } else if (this.lexeme.getType() == LexemeType.IDENTIFIER) {
-                this.matchToken(LexemeType.IDENTIFIER);
+                this.EXP();
             } else {
                 this.raiseErrorUnexpectedSymbol(lexeme);
             }
