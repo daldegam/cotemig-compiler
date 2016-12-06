@@ -225,9 +225,9 @@ public class Lexical {
                     } else if (currentChar == ')') {
                         return lexeme.setType(LexemeType.PARENTHESIS_CLOSE);
                     } else if (currentChar == '+') {
-                        return lexeme.setType(LexemeType.OP_ARITMETIC_PLUS);
+                        this.finiteState = LexemeType.OP_ARITMETIC_PLUS;
                     } else if (currentChar == '-') {
-                        return lexeme.setType(LexemeType.OP_ARITMETIC_LESS);
+                        this.finiteState = LexemeType.OP_ARITMETIC_LESS;
                     } else if (currentChar == '*') {
                         return lexeme.setType(LexemeType.OP_ARITMETIC_MULT);
                     } else if (currentChar == '%') {
@@ -349,6 +349,20 @@ public class Lexical {
                     } else {
                         this.backSourceOffsetPointer();
                         return lexeme.removeLastChar().setType(LexemeType.OP_REL_LT);
+                    }
+                case LexemeType.OP_ARITMETIC_PLUS:
+                    if (currentChar == '+') {
+                        return lexeme.setType(LexemeType.OP_ARITMETIC_INC);
+                    } else {
+                        this.backSourceOffsetPointer();
+                        return lexeme.removeLastChar().setType(LexemeType.OP_ARITMETIC_PLUS);
+                    }
+                case LexemeType.OP_ARITMETIC_LESS:
+                    if (currentChar == '+') {
+                        return lexeme.setType(LexemeType.OP_ARITMETIC_DEC);
+                    } else {
+                        this.backSourceOffsetPointer();
+                        return lexeme.removeLastChar().setType(LexemeType.OP_ARITMETIC_LESS);
                     }
                 case LexemeType.OP_ATTRIBUTION:
                     if (currentChar == '=') {

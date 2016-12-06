@@ -33,11 +33,23 @@ public class Syntactic {
     /**
      * Levanta um erro de simbolo não esperado
      *
-     * @param lexeme Lemexa
+     * @param lexeme Lemexa recebido
      */
     private void raiseErrorUnexpectedSymbol(Lexeme lexeme) {
         this.errors.add("Unexpected symbol: " + lexeme.getLexeme() + ", line: "
                 + (lexeme.getSourceLine() + 1) + ", position: " + lexeme.getSourceColumn() + "\n");
+    }
+
+    /**
+     * Levanta um erro de simbolo não esperado
+     *
+     * @param lexeme Lexema recebido
+     * @param expected Tipo esperado
+     */
+    private void raiseErrorUnexpectedSymbol(Lexeme lexeme, int expected) {
+        this.errors.add("Unexpected symbol: " + lexeme.getLexeme() + ", line: "
+                + (lexeme.getSourceLine() + 1) + ", position: " + lexeme.getSourceColumn()
+                + ", Expected: " + LexemeType.getTypeName(expected) + "\n");
     }
 
     /**
@@ -63,15 +75,13 @@ public class Syntactic {
     }
 
     public void run() {
-        /*
-        // Test if all right
-        Lexeme lexeme = this.lexical.getToken();
-        while (lexeme != null) {
-            this.symbolTable.checkAndInstall(lexeme);
-            lexeme = this.lexical.getToken();
-        }
-         */
 
+//        Test if all right
+//        Lexeme lexeme = this.lexical.getToken();
+//        while (lexeme != null) {
+//            this.symbolTable.checkAndInstall(lexeme);
+//            lexeme = this.lexical.getToken();
+//        }
         this.lexeme = this.lexical.getToken();
 
         if (this.lexeme.getType() == LexemeType.END_OF_FILE) {
@@ -81,7 +91,6 @@ public class Syntactic {
                     JOptionPane.ERROR_MESSAGE);
         }
 
-        
         try {
             // Start
             PROG();
@@ -94,32 +103,29 @@ public class Syntactic {
 
     private boolean matchToken(int expected) throws SourceErrorException {
         if (lexeme == null) {
-            System.err.println("Código fonte terminado de forma inesperada...");
             throw new SourceErrorException();
         } else if (lexeme.getType() == expected) {
+
+            // if current lexeme is a Identifier, check and install into symboltable
+            if (lexeme.getType() == LexemeType.IDENTIFIER) {
+                this.symbolTable.checkAndInstall(lexeme);
+            }
+
+            // Get next lexeme
             this.lexeme = this.lexical.getToken();
             return true;
         } else {
-            System.out.println(">> Token não esperado...");
-            this.raiseErrorUnexpectedSymbol(lexeme);
+            System.out.println(">> Unexpected token...");
+            this.raiseErrorUnexpectedSymbol(lexeme, expected);
         }
         return false;
     }
 
-    private void PROG()  throws SourceErrorException{
+    private void PROG() throws SourceErrorException {
         System.out.println("Called PROG();");
-        
-        while (this.lexeme != null && (this.lexeme.getType() == LexemeType.IF
-                || this.lexeme.getType() == LexemeType.WHILE
-                || this.lexeme.getType() == LexemeType.FOR
-                || this.lexeme.getType() == LexemeType.PRINT
-                || this.lexeme.getType() == LexemeType.READ
-                || this.lexeme.getType() == LexemeType.TYPE_CHAR
-                || this.lexeme.getType() == LexemeType.TYPE_INT
-                || this.lexeme.getType() == LexemeType.TYPE_REAL
-                || this.lexeme.getType() == LexemeType.TYPE_BOOL
-                || this.lexeme.getType() == LexemeType.IDENTIFIER
-                || this.lexeme.getType() == LexemeType.KEY_OPEN)) {
+
+        while (this.lexeme != null
+                && this.lexeme.getType() != LexemeType.END_OF_FILE) {
             this.CMD();
         }
     }
@@ -144,13 +150,32 @@ public class Syntactic {
         }
     }
 
+    private byte VAR() throws SourceErrorException {
+        System.out.println("Called VAR();");
+        this.matchToken(LexemeType.IDENTIFIER);
+        if (this.lexeme.getType() == LexemeType.BRACKETS_OPEN) {
+            this.matchToken(LexemeType.BRACKETS_OPEN);
+            if (this.lexeme.getType() == LexemeType.NUM_DEC) {
+                this.matchToken(LexemeType.NUM_DEC);
+            } else if (this.lexeme.getType() == LexemeType.IDENTIFIER) {
+                this.matchToken(LexemeType.IDENTIFIER);
+            } else {
+                this.raiseErrorUnexpectedSymbol(lexeme);
+            }
+            this.matchToken(LexemeType.BRACKETS_CLOSE);
+            return 2;
+        }
+        return 1;
+    }
+
     private void DECLARATION() throws SourceErrorException {
         System.out.println("Called DECLARATION();");
         this.TYPE();
-        this.matchToken(LexemeType.IDENTIFIER);
-        if (this.lexeme.getType() == LexemeType.BRACKETS_OPEN) {
+
+        byte type = this.VAR();
+        if (type == 2) { // array
             this.DECLARATION_ARRAY();
-        } else if (this.lexeme.getType() == LexemeType.OP_ATTRIBUTION) {
+        } else {
             this.DECLARATION_VAR();
         }
         this.matchToken(LexemeType.TERMINATOR);
@@ -164,9 +189,6 @@ public class Syntactic {
 
     private void DECLARATION_ARRAY() throws SourceErrorException {
         System.out.println("Called DECLARATION_ARRAY();");
-        this.matchToken(LexemeType.BRACKETS_OPEN);
-        this.matchToken(LexemeType.NUM_DEC);
-        this.matchToken(LexemeType.BRACKETS_CLOSE);
         if (this.lexeme.getType() == LexemeType.OP_ATTRIBUTION) {
             this.matchToken(LexemeType.OP_ATTRIBUTION);
             this.matchToken(LexemeType.KEY_OPEN);
@@ -195,7 +217,7 @@ public class Syntactic {
 
     private void ATTRIBUTION() throws SourceErrorException {
         System.out.println("Called ATTRIBUTION();");
-        this.matchToken(LexemeType.IDENTIFIER);
+        this.VAR();
         this.matchToken(LexemeType.OP_ATTRIBUTION);
         this.EXP();
         this.matchToken(LexemeType.TERMINATOR);
@@ -240,10 +262,12 @@ public class Syntactic {
         this.matchToken(LexemeType.FOR);
         this.matchToken(LexemeType.PARENTHESIS_OPEN);
 
+        // warning! attribution has expected a terminator on end!
         if (this.lexeme.getType() == LexemeType.IDENTIFIER) {
-            this.matchToken(LexemeType.IDENTIFIER);
+            this.ATTRIBUTION();
+        } else {
+            this.matchToken(LexemeType.TERMINATOR);
         }
-        this.matchToken(LexemeType.COMMA);
 
         if (this.lexeme.getType() == LexemeType.PARENTHESIS_OPEN
                 || this.lexeme.getType() == LexemeType.OP_LOGICAL_NOT
@@ -257,7 +281,7 @@ public class Syntactic {
                 || this.lexeme.getType() == LexemeType.STRING) {
             this.EXP();
         }
-        this.matchToken(LexemeType.COMMA);
+        this.matchToken(LexemeType.TERMINATOR);
 
         if (this.lexeme.getType() == LexemeType.PARENTHESIS_OPEN
                 || this.lexeme.getType() == LexemeType.OP_LOGICAL_NOT
@@ -311,6 +335,7 @@ public class Syntactic {
                 break;
             default:
                 this.raiseErrorUnexpectedSymbol(lexeme);
+                this.lexeme = this.lexical.getToken(); // get next token
         }
     }
 
@@ -356,9 +381,17 @@ public class Syntactic {
 
         while (this.lexeme.getType() == LexemeType.OP_ARITMETIC_PLUS
                 || this.lexeme.getType() == LexemeType.OP_ARITMETIC_LESS
+                || this.lexeme.getType() == LexemeType.OP_ARITMETIC_INC
+                || this.lexeme.getType() == LexemeType.OP_ARITMETIC_DEC
                 || this.lexeme.getType() == LexemeType.OP_LOGICAL_OR) {
-            this.OP_ADD();
-            this.TERM();
+
+            if (this.lexeme.getType() == LexemeType.OP_ARITMETIC_INC
+                    || this.lexeme.getType() == LexemeType.OP_ARITMETIC_DEC) {
+                this.OP_ADD(); // if ++ or -- not call TERM
+            } else {
+                this.OP_ADD();
+                this.TERM();
+            }
         }
     }
 
@@ -388,7 +421,7 @@ public class Syntactic {
                 this.FACTOR();
                 break;
             case LexemeType.IDENTIFIER:
-                this.matchToken(LexemeType.IDENTIFIER);
+                this.VAR();
                 break;
             case LexemeType.NUM_DEC:
                 this.matchToken(LexemeType.NUM_DEC);
@@ -451,6 +484,12 @@ public class Syntactic {
             case LexemeType.OP_ARITMETIC_LESS:
                 matchToken(LexemeType.OP_ARITMETIC_LESS);
                 break;
+            case LexemeType.OP_ARITMETIC_INC:
+                matchToken(LexemeType.OP_ARITMETIC_INC);
+                break;
+            case LexemeType.OP_ARITMETIC_DEC:
+                matchToken(LexemeType.OP_ARITMETIC_DEC);
+                break;
             case LexemeType.OP_LOGICAL_OR:
                 matchToken(LexemeType.OP_LOGICAL_OR);
                 break;
@@ -482,29 +521,17 @@ public class Syntactic {
         }
     }
 
-    private void PRINT()  throws SourceErrorException{
+    private void PRINT() throws SourceErrorException {
         System.out.println("Called PRINT();");
         this.matchToken(LexemeType.PRINT);
         this.matchToken(LexemeType.PARENTHESIS_OPEN);
         this.matchToken(LexemeType.STRING);
-        
-        if (this.lexeme.getType() == LexemeType.COMMA) {
-            this.matchToken(LexemeType.COMMA);
 
-            while (this.lexeme.getType() == LexemeType.PARENTHESIS_OPEN
-                    || this.lexeme.getType() == LexemeType.OP_LOGICAL_NOT
-                    || this.lexeme.getType() == LexemeType.IDENTIFIER
-                    || this.lexeme.getType() == LexemeType.NUM_DEC
-                    || this.lexeme.getType() == LexemeType.NUM_HEX
-                    || this.lexeme.getType() == LexemeType.NUM_REAL
-                    || this.lexeme.getType() == LexemeType.NUM_OCT
-                    || this.lexeme.getType() == LexemeType.TRUE
-                    || this.lexeme.getType() == LexemeType.FALSE
-                    || this.lexeme.getType() == LexemeType.STRING) {
-                this.FACTOR();
-            }
+        while (this.lexeme.getType() == LexemeType.COMMA) {
+            this.matchToken(LexemeType.COMMA);
+            this.FACTOR();
         }
-        
+
         this.matchToken(LexemeType.PARENTHESIS_CLOSE);
         this.matchToken(LexemeType.TERMINATOR);
     }
@@ -514,21 +541,9 @@ public class Syntactic {
         this.matchToken(LexemeType.READ);
         this.matchToken(LexemeType.PARENTHESIS_OPEN);
         this.matchToken(LexemeType.STRING);
-        if (this.lexeme.getType() == LexemeType.COMMA) {
+        while (this.lexeme.getType() == LexemeType.COMMA) {
             this.matchToken(LexemeType.COMMA);
-
-            while (this.lexeme.getType() == LexemeType.PARENTHESIS_OPEN
-                    || this.lexeme.getType() == LexemeType.OP_LOGICAL_NOT
-                    || this.lexeme.getType() == LexemeType.IDENTIFIER
-                    || this.lexeme.getType() == LexemeType.NUM_DEC
-                    || this.lexeme.getType() == LexemeType.NUM_HEX
-                    || this.lexeme.getType() == LexemeType.NUM_REAL
-                    || this.lexeme.getType() == LexemeType.NUM_OCT
-                    || this.lexeme.getType() == LexemeType.TRUE
-                    || this.lexeme.getType() == LexemeType.FALSE
-                    || this.lexeme.getType() == LexemeType.STRING) {
-                this.FACTOR();
-            }
+            this.FACTOR();
         }
 
         this.matchToken(LexemeType.PARENTHESIS_CLOSE);
