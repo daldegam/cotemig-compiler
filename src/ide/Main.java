@@ -249,6 +249,15 @@ public class Main extends javax.swing.JFrame {
         for(String message : symbolTableOutput) {
             jTextAreaSymbolTable.append(message);
         }
+        
+        List<String> syntacticErrors = compiler.getSyntacticErrors();
+        for(String error : syntacticErrors) {
+            jTextAreaErrors.append("Syntactic Error: " + error);
+        }
+        
+        if(lexicalErrors.size() == 0 && syntacticErrors.size() == 0) {
+            JOptionPane.showMessageDialog(this, "Compilado com sucesso!", "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+        }
     }//GEN-LAST:event_jMenuCompileActionPerformed
 
     /**

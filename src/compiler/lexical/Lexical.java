@@ -78,6 +78,7 @@ public class Lexical {
 
     /**
      * Levanta um erro de declaração de comentário sem termino
+     *
      * @param c Simbolo
      */
     private void raiseErrorCommentWithoutEnd() {
@@ -86,6 +87,7 @@ public class Lexical {
 
     /**
      * Levanta um erro de declaração de string sem termino
+     *
      * @param c Simbolo
      */
     private void raiseErrorStringWithoutEnd() {
@@ -94,32 +96,36 @@ public class Lexical {
 
     /**
      * Levanta um erro de declaração de char sem termino
+     *
      * @param c Simbolo
      */
     private void raiseErrorCharWithoutEnd() {
         this.errors.add("Char without end (fatal error)\n");
     }
-    
+
     /**
      * Levanta um erro de simbolo não reconhecido
+     *
      * @param c Simbolo
      */
     private void raiseErrorUnknownSymbol(char c) {
-        this.errors.add("Unknown symbol: " + c + ", line: " 
+        this.errors.add("Unknown symbol: " + c + ", line: "
                 + (this.sourceOffsetLinePointer + 1) + ", position: " + (this.sourceOffsetLinePositionPointer - 1) + "\n");
     }
 
     /**
      * Levanta um erro de simbolo não esperado
+     *
      * @param c Simbolo
      */
     private void raiseErrorUnexpectedSymbol(char c) {
-        this.errors.add("Unexpected symbol: " + c + ", line: " 
+        this.errors.add("Unexpected symbol: " + c + ", line: "
                 + (this.sourceOffsetLinePointer + 1) + ", position: " + (this.sourceOffsetLinePositionPointer - 1) + "\n");
     }
 
     /**
      * Adiciona uma mensagem no output do analisador
+     *
      * @param message Mensagem
      */
     private void addOutput(String message) {
@@ -127,30 +133,31 @@ public class Lexical {
     }
 
     /**
-     * Inicializa o analisador lexico
+     * Retorna um proximo token do codigo fonte
+     *
+     * @return Lexema
      */
-    public void parser() {
-        Lexeme lexeme = this.getToken();
-        while (lexeme != null) {
+    public Lexeme getToken() {
+        Lexeme lexeme = this.getInternalToken();
+        if (lexeme != null) {
             this.addOutput(String.format("<%s,\"%s\">\n", lexeme.getTypeString(), lexeme.getLexeme()));
-
-            this.symbolTable.checkAndInstall(lexeme);
-
-            lexeme = this.getToken(); // get next token
         }
+        return lexeme;
     }
-    
+
     /**
      * Incrementa uma posição do carro no codigo fonte
+     *
      * @return Posição global no código fonte
      */
     private int nextSourceOffsetPointer() {
         this.sourceOffsetLinePositionPointer++;
         return this.sourceOffsetPointer++;
     }
-    
+
     /**
      * Decrementa uma posição do carro no código fonte
+     *
      * @return Posição global no código fonte
      */
     private int backSourceOffsetPointer() {
@@ -160,6 +167,7 @@ public class Lexical {
 
     /**
      * Obtem o proximo char do codigo fonte
+     *
      * @return caractere a ser tratado
      */
     private char getNextChar() {
@@ -168,11 +176,14 @@ public class Lexical {
 
     /**
      * Retorna um proximo token do codigo fonte
-     * @return 
+     *
+     * @return Lexema
      */
-    private Lexeme getToken() {
+    private Lexeme getInternalToken() {
         this.finiteState = 0;
         Lexeme lexeme = new Lexeme();
+        lexeme.setSourceLine(this.sourceOffsetLinePointer);
+        lexeme.setSourceColumn(this.sourceOffsetLinePositionPointer);
         while (this.sourceOffsetPointer < this.sourceCode.length()) {
             char currentChar = this.getNextChar();
             lexeme.appendLexeme(currentChar);
@@ -214,9 +225,9 @@ public class Lexical {
                     } else if (currentChar == ')') {
                         return lexeme.setType(LexemeType.PARENTHESIS_CLOSE);
                     } else if (currentChar == '+') {
-                        return lexeme.setType(LexemeType.OP_ARITMETIC_PLUS);
+                        this.finiteState = LexemeType.OP_ARITMETIC_PLUS;
                     } else if (currentChar == '-') {
-                        return lexeme.setType(LexemeType.OP_ARITMETIC_LESS);
+                        this.finiteState = LexemeType.OP_ARITMETIC_LESS;
                     } else if (currentChar == '*') {
                         return lexeme.setType(LexemeType.OP_ARITMETIC_MULT);
                     } else if (currentChar == '%') {
@@ -312,7 +323,7 @@ public class Lexical {
                         lexeme.removeLastChar(); // actual symbol
 
                         this.raiseErrorUnexpectedSymbol(currentChar);
-                        
+
                         this.backSourceOffsetPointer();
                         this.finiteState = 0; // back to initial state
                     }
@@ -325,7 +336,7 @@ public class Lexical {
                         lexeme.removeLastChar(); // actual symbol
 
                         this.raiseErrorUnexpectedSymbol(currentChar);
-                        
+
                         this.backSourceOffsetPointer();
                         this.finiteState = 0; // back to initial state
                     }
@@ -338,6 +349,20 @@ public class Lexical {
                     } else {
                         this.backSourceOffsetPointer();
                         return lexeme.removeLastChar().setType(LexemeType.OP_REL_LT);
+                    }
+                case LexemeType.OP_ARITMETIC_PLUS:
+                    if (currentChar == '+') {
+                        return lexeme.setType(LexemeType.OP_ARITMETIC_INC);
+                    } else {
+                        this.backSourceOffsetPointer();
+                        return lexeme.removeLastChar().setType(LexemeType.OP_ARITMETIC_PLUS);
+                    }
+                case LexemeType.OP_ARITMETIC_LESS:
+                    if (currentChar == '+') {
+                        return lexeme.setType(LexemeType.OP_ARITMETIC_DEC);
+                    } else {
+                        this.backSourceOffsetPointer();
+                        return lexeme.removeLastChar().setType(LexemeType.OP_ARITMETIC_LESS);
                     }
                 case LexemeType.OP_ATTRIBUTION:
                     if (currentChar == '=') {

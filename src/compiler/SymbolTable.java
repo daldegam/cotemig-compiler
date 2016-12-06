@@ -47,7 +47,7 @@ public class SymbolTable {
     public void checkAndInstall(Lexeme lexeme) {
         if (lexeme.getType() == LexemeType.IDENTIFIER) {
             for (Lexeme symbol : this.symbolTable) {
-                if (symbol.getLexeme().equals(lexeme.getLexeme().toLowerCase())) {
+                if (symbol.getLexeme().toLowerCase().equals(lexeme.getLexeme().toLowerCase())) {
                     return; // has exists into table
                 }
             }
@@ -67,7 +67,11 @@ public class SymbolTable {
     public List<String> getTableString() {
         List<String> output = new ArrayList<String>();
         for (Lexeme symbol : this.symbolTable) {
-            output.add(String.format("<%s,\"%s\">\n", symbol.getTypeString(), symbol.getLexeme()));
+            output.add(String.format("<%s, \"%s\", \"%s\", \"%s\">\n", 
+                    symbol.getTypeString(), 
+                    symbol.getLexeme(),
+                    symbol.getVariableClass(),
+                    symbol.getVariableType()));
         }
         return output;
     }

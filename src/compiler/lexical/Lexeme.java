@@ -17,14 +17,23 @@ public class Lexeme {
 
     private int type;
     private String lexeme;
+    private int sourceLine;
+    private int sourceColumn;
+    
+    private VariableClass variableClass;
+    private VariableType variableType;
 
     public Lexeme() {
         this.lexeme = "";
+        this.variableClass = VariableClass.NULL;
+        this.variableType = VariableType.NULL;
     }
     
     public Lexeme(String lexeme, int type) {
         this.lexeme = lexeme;
         this.type = type;
+        this.variableClass = VariableClass.NULL;
+        this.variableType = VariableType.NULL;
     }
 
     public Lexeme setType(int type) {
@@ -51,5 +60,37 @@ public class Lexeme {
 
     public String getTypeString() {
         return LexemeType.getTypeName(this.type);
+    }
+    
+    public int getSourceLine() {
+        return sourceLine;
+    }
+
+    public void setSourceLine(int sourceLine) {
+        this.sourceLine = sourceLine;
+    }
+
+    public int getSourceColumn() {
+        return sourceColumn;
+    }
+
+    public void setSourceColumn(int sourceColumn) {
+        this.sourceColumn = sourceColumn;
+    }
+
+    public VariableClass getVariableClass() {
+        return variableClass;
+    }
+
+    public void setVariableClass(VariableClass variableClass) {
+        this.variableClass = variableClass;
+    }
+
+    public VariableType getVariableType() {
+        return variableType;
+    }
+
+    public void setVariableType(VariableType variableType) {
+        this.variableType = variableType;
     }
 }

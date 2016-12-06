@@ -5,9 +5,11 @@
  */
 package compiler;
 
+import compiler.lexical.Lexeme;
 import javax.swing.JEditorPane;
 
 import compiler.lexical.Lexical;
+import compiler.syntactic.Syntactic;
 import java.util.List;
 
 /**
@@ -21,6 +23,8 @@ public class Compiler {
     private SymbolTable symbolTable;
 
     private Lexical lexical;
+    
+    private Syntactic syntactic;
 
     public List<String> getLexicalErrors() {
         return this.lexical.getErrors();
@@ -33,6 +37,10 @@ public class Compiler {
     public List<String> getSymbolTable() {
         return this.symbolTable.getTableString();
     }
+    
+    public List<String> getSyntacticErrors() {
+        return this.syntactic.getErrors();
+    }
 
     public Compiler(JEditorPane sourceEditor) {
         this.sourceEditor = sourceEditor;
@@ -41,6 +49,8 @@ public class Compiler {
 
     public void run() {
         this.lexical = new Lexical(this.symbolTable, this.sourceEditor.getText());
-        this.lexical.parser();
+        this.syntactic = new Syntactic(this.lexical, this.symbolTable);
+        
+        this.syntactic.run();
     }
 }

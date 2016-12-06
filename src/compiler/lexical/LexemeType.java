@@ -60,6 +60,8 @@ public class LexemeType {
     public static final int PRINT                   = 0x00002B00;
     public static final int READ                    = 0x00002C00;
     public static final int CHAR                    = 0x00002D00;
+    public static final int OP_ARITMETIC_INC        = 0x00002F00;
+    public static final int OP_ARITMETIC_DEC        = 0x00003000;
     
     /**
      * Mapa dos nomes dos tipos (runtime)
