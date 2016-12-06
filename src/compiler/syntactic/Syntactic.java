@@ -9,6 +9,8 @@ import compiler.SymbolTable;
 import compiler.lexical.Lexeme;
 import compiler.lexical.LexemeType;
 import compiler.lexical.Lexical;
+import compiler.lexical.VariableClass;
+import compiler.lexical.VariableType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -130,52 +132,69 @@ public class Syntactic {
         }
     }
 
-    private void TYPE() throws SourceErrorException {
+    private VariableType TYPE() throws SourceErrorException {
         System.out.println("Called TYPE();");
         switch (this.lexeme.getType()) {
             case LexemeType.TYPE_CHAR:
                 this.matchToken(LexemeType.TYPE_CHAR);
-                break;
+                return VariableType.TYPE_CHAR;
             case LexemeType.TYPE_INT:
                 this.matchToken(LexemeType.TYPE_INT);
-                break;
+                return VariableType.TYPE_INT;
             case LexemeType.TYPE_REAL:
                 this.matchToken(LexemeType.TYPE_REAL);
-                break;
+                return VariableType.TYPE_REAL;
             case LexemeType.TYPE_BOOL:
                 this.matchToken(LexemeType.TYPE_BOOL);
-                break;
+                return VariableType.TYPE_BOOL;
             default:
                 this.raiseErrorUnexpectedSymbol(lexeme);
         }
+        return VariableType.NULL;
     }
 
-    private byte VAR() throws SourceErrorException {
+    private VariableClass VAR(VariableType varType) throws SourceErrorException {
         System.out.println("Called VAR();");
+        Lexeme variableReference = this.lexeme;
         this.matchToken(LexemeType.IDENTIFIER);
-        if (this.lexeme.getType() == LexemeType.BRACKETS_OPEN) {
-            this.matchToken(LexemeType.BRACKETS_OPEN);
-            if (this.lexeme.getType() == LexemeType.NUM_DEC) {
-                this.matchToken(LexemeType.NUM_DEC);
-            } else if (this.lexeme.getType() == LexemeType.IDENTIFIER) {
-                this.EXP();
-            } else {
-                this.raiseErrorUnexpectedSymbol(lexeme);
-            }
-            this.matchToken(LexemeType.BRACKETS_CLOSE);
-            return 2;
+        
+        if(varType != null) {
+            variableReference.setVariableType(varType);
         }
-        return 1;
+
+        if (this.lexeme.getType() == LexemeType.BRACKETS_OPEN) { // Array
+
+            this.matchToken(LexemeType.BRACKETS_OPEN);
+
+            switch (this.lexeme.getType()) {
+                case LexemeType.NUM_DEC:
+                    this.matchToken(LexemeType.NUM_DEC);
+                    break;
+                case LexemeType.IDENTIFIER:
+                    this.EXP();
+                    break;
+                default:
+                    this.raiseErrorUnexpectedSymbol(lexeme);
+                    break;
+            }
+
+            this.matchToken(LexemeType.BRACKETS_CLOSE);
+
+            variableReference.setVariableClass(VariableClass.ARRAY);
+            return VariableClass.ARRAY; // Array
+        }
+
+        variableReference.setVariableClass(VariableClass.VARIABLE);
+        return VariableClass.VARIABLE; // Variable
     }
 
     private void DECLARATION() throws SourceErrorException {
         System.out.println("Called DECLARATION();");
-        this.TYPE();
-
-        byte type = this.VAR();
-        if (type == 2) { // array
+        VariableType varType = this.TYPE();
+        VariableClass type = this.VAR(varType);
+        if (type == VariableClass.ARRAY) { // array
             this.DECLARATION_ARRAY();
-        } else {
+        } else if (this.lexeme.getType() == LexemeType.OP_ATTRIBUTION) {
             this.DECLARATION_VAR();
         }
         this.matchToken(LexemeType.TERMINATOR);
@@ -217,7 +236,7 @@ public class Syntactic {
 
     private void ATTRIBUTION() throws SourceErrorException {
         System.out.println("Called ATTRIBUTION();");
-        this.VAR();
+        this.VAR(null);
         this.matchToken(LexemeType.OP_ATTRIBUTION);
         this.EXP();
         this.matchToken(LexemeType.TERMINATOR);
@@ -421,7 +440,7 @@ public class Syntactic {
                 this.FACTOR();
                 break;
             case LexemeType.IDENTIFIER:
-                this.VAR();
+                this.VAR(null);
                 break;
             case LexemeType.NUM_DEC:
                 this.matchToken(LexemeType.NUM_DEC);

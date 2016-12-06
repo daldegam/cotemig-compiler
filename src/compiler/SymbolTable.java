@@ -67,9 +67,11 @@ public class SymbolTable {
     public List<String> getTableString() {
         List<String> output = new ArrayList<String>();
         for (Lexeme symbol : this.symbolTable) {
-            output.add(String.format("<%s,\"%s\">\n", 
+            output.add(String.format("<%s, \"%s\", \"%s\", \"%s\">\n", 
                     symbol.getTypeString(), 
-                    symbol.getLexeme()));
+                    symbol.getLexeme(),
+                    symbol.getVariableClass(),
+                    symbol.getVariableType()));
         }
         return output;
     }
