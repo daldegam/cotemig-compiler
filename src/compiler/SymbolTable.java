@@ -47,7 +47,7 @@ public class SymbolTable {
     public void checkAndInstall(Lexeme lexeme) {
         if (lexeme.getType() == LexemeType.IDENTIFIER) {
             for (Lexeme symbol : this.symbolTable) {
-                if (symbol.getLexeme().equals(lexeme.getLexeme().toLowerCase())) {
+                if (symbol.getLexeme().toLowerCase().equals(lexeme.getLexeme().toLowerCase())) {
                     return; // has exists into table
                 }
             }
